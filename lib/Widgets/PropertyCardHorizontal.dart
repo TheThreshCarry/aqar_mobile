@@ -121,9 +121,9 @@ class PropertyCardHorizontal extends ConsumerWidget {
                               ? (property["price"] + " DZ/month")
                               : "",
                           style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              color: Colors.grey[200]),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                          ),
                         ),
                         Row(
                           children: [
@@ -136,9 +136,9 @@ class PropertyCardHorizontal extends ConsumerWidget {
                                   ? (property["views"].toString())
                                   : "",
                               style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                  color: Colors.grey[200]),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                              ),
                             ),
                             SizedBox(
                               width: 5,
@@ -153,11 +153,11 @@ class PropertyCardHorizontal extends ConsumerWidget {
                             Text(
                               property["favorites"] != null
                                   ? (property["favorites"].toString())
-                                  : "",
+                                  : "0",
                               style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                  color: Colors.grey[200]),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),

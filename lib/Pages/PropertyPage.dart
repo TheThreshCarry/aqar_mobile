@@ -293,6 +293,14 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                         ),
                                         GestureDetector(
                                           onTap: () async {
+                                            if (ref
+                                                    .read(authProvider)
+                                                    .userData["id"] ==
+                                                null) {
+                                              Navigator.of(context)
+                                                  .popAndPushNamed("/login");
+                                              return;
+                                            }
                                             if (snapshot.data == false) {
                                               await ref
                                                   .read(propertiesController)
@@ -524,6 +532,7 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                                       width: 10,
                                                     ),
                                                     Flexible(
+                                                      fit: FlexFit.tight,
                                                       child: Text(
                                                         ref
                                                                     .read(
@@ -535,6 +544,7 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                                             .ellipsis,
                                                         style: TextStyle(
                                                             fontSize: 24,
+                                                            color: Colors.white,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .w900),
@@ -545,6 +555,19 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                                     ),
                                                     GestureDetector(
                                                       onTap: () async {
+                                                        if (ref
+                                                                .read(
+                                                                    authProvider)
+                                                                .userData["id"] ==
+                                                            null) {
+                                                          print(
+                                                              "not logged in");
+                                                          Navigator.of(context)
+                                                              .popAndPushNamed(
+                                                                  "/login");
+                                                          return;
+                                                          return;
+                                                        }
                                                         var exists = await Dio().get(
                                                             "https://aqar-server.herokuapp.com/messages/conversation",
                                                             queryParameters: {
@@ -578,7 +601,17 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                                                         authProvider)
                                                                     .userData["id"]
                                                               });
-                                                          print(create.data);
+                                                          print({
+                                                            "userOne": ref
+                                                                    .read(
+                                                                        propertiesController)
+                                                                    .selectedPropertyOwner?["id"] ??
+                                                                "",
+                                                            "userTwo": ref
+                                                                .read(
+                                                                    authProvider)
+                                                                .userData["id"]
+                                                          });
                                                         } else {
                                                           print(exists
                                                               .data["rows"][0]);

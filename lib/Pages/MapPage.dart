@@ -54,7 +54,7 @@ class _MapPageState extends ConsumerState<MapPage> {
     CameraPosition position = CameraPosition(
       target: LatLng(ref.read(authProvider).userPosition?.latitude ?? 2,
           ref.read(authProvider).userPosition?.longitude ?? 2),
-      zoom: 10.4746,
+      zoom: 11.8746,
     );
     Size size = MediaQuery.of(context).size;
     markers.add(Marker(

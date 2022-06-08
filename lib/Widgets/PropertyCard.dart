@@ -30,7 +30,7 @@ class PropertyCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(10),
         child: Container(
             width: 200,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
                 color: ref.read(themeProvider.notifier).state ==
                         ThemeController.lightTheme
@@ -104,14 +104,34 @@ class PropertyCard extends ConsumerWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                Text(
-                  property["price"] != null
-                      ? (property["price"] + " DZ/month")
-                      : "",
-                  style: TextStyle(
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      property["description"] ?? "",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    property["price"] != null
+                        ? (property["price"] +
+                            (property["offer_type"] == 'r'
+                                ? "DZ/month"
+                                : " DZ"))
+                        : "",
+                    style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 12,
-                      color: Colors.grey[200]),
+                    ),
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -126,9 +146,9 @@ class PropertyCard extends ConsumerWidget {
                             ? (property["views"].toString())
                             : "",
                         style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Colors.grey[200]),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                        ),
                       ),
                       SizedBox(
                         width: 5,
@@ -143,11 +163,11 @@ class PropertyCard extends ConsumerWidget {
                       Text(
                         property["favorites"] != null
                             ? (property["favorites"].toString())
-                            : "",
+                            : "0",
                         style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Colors.grey[200]),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
