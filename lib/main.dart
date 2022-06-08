@@ -7,6 +7,7 @@ import 'package:aqar_mobile/Controllers/AuthController.dart';
 import 'package:aqar_mobile/Controllers/MiscController.dart';
 import 'package:aqar_mobile/Controllers/PropertiesController.dart';
 import 'package:aqar_mobile/Controllers/ThemeController.dart';
+import 'package:aqar_mobile/Pages/Agency/HomeAgency.dart';
 import 'package:aqar_mobile/Pages/AllowLocation.dart';
 import 'package:aqar_mobile/Pages/CheckFirstTime.dart';
 import 'package:aqar_mobile/Pages/Home.dart';
@@ -69,6 +70,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         "/allowLocation": (context) => AllowLocation(),
         "/test": (context) => MyHomePage(),
         "/home": (context) => Home(),
+        "/agency/home": (context) => HomeAgency(),
         "/login": (context) => SignInPage(),
         "/register": (context) => SignUpPage()
       },
@@ -142,7 +144,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     },
                     child: isLoading
                         ? CircularProgressIndicator()
-                        : Text(isLoggedIn ? "Logout" : "Login")),
+                        : Text(isLoggedIn ? "Déconexion" : "Se Connecter")),
                 TextButton(
                     onPressed: () async {
                       dynamic result =

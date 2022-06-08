@@ -5,6 +5,9 @@ import 'dart:developer';
 import 'package:aqar_mobile/Controllers/FilerProvider.dart';
 import 'package:aqar_mobile/Controllers/MiscController.dart';
 import 'package:aqar_mobile/Controllers/PropertiesController.dart';
+import 'package:aqar_mobile/Pages/Agency/AgencyOffers.dart';
+import 'package:aqar_mobile/Pages/Agency/HomePageAgency.dart';
+import 'package:aqar_mobile/Pages/Agency/NewOffer.dart';
 import 'package:aqar_mobile/Pages/FavoritePages.dart';
 import 'package:aqar_mobile/Pages/HomePage.dart';
 import 'package:aqar_mobile/Pages/MapPage.dart';
@@ -13,20 +16,21 @@ import 'package:aqar_mobile/Pages/ResultPage.dart';
 import 'package:aqar_mobile/Widgets/CategorySelecter.dart';
 import 'package:aqar_mobile/Widgets/NavigationBar.dart';
 import 'package:aqar_mobile/Pages/ProfilePage.dart';
+import 'package:aqar_mobile/Widgets/NavigationBarAgency.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_slider/flutter_multi_slider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:miniplayer/miniplayer.dart';
 
-class Home extends ConsumerStatefulWidget {
-  Home({Key? key}) : super(key: key);
+class HomeAgency extends ConsumerStatefulWidget {
+  HomeAgency({Key? key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _HomeAgencyState createState() => _HomeAgencyState();
 }
 
-class _HomeState extends ConsumerState<Home>
+class _HomeAgencyState extends ConsumerState<HomeAgency>
     with SingleTickerProviderStateMixin {
   bool loading = false;
   @override
@@ -62,15 +66,15 @@ class _HomeState extends ConsumerState<Home>
                   child: TabBarView(
                     physics: NeverScrollableScrollPhysics(),
                     children: [
-                      HomePage(),
-                      FavoritePage(),
-                      MapPage(),
+                      HomePageAgency(),
+                      AgencyOffers(),
+                      NewOffer(),
                       MessagePage(),
                       ProfilePage()
                     ],
                     controller: ref.read(generalProvider).homePageController,
                   )),
-              Positioned(bottom: 0, child: CustomNavigationBar()),
+              Positioned(bottom: 0, child: CustomNavigationBarAgency()),
             ]),
           ),
           if (filterOn == true)
@@ -150,35 +154,6 @@ class _HomeState extends ConsumerState<Home>
                                       ],
                                     ),
                                   ),
-                                  Text(
-                                    "Distance",
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  Container(
-                                      height: 100,
-                                      width: size.width,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                              "Distance: ${ref.read(propertiesController).distanceSelected.toStringAsFixed(0)} KM"),
-                                          Slider(
-                                              value: ref
-                                                  .read(propertiesController)
-                                                  .distanceSelected,
-                                              min: 0,
-                                              max: 100,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  ref
-                                                      .read(
-                                                          propertiesController)
-                                                      .distanceSelected = value;
-                                                });
-                                              }),
-                                        ],
-                                      )),
                                   Text(
                                     "Categories",
                                     style: TextStyle(

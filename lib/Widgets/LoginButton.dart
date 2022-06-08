@@ -42,6 +42,8 @@ class _LoginButtonState extends ConsumerState<LoginButton> {
         },
         child: isLoading
             ? CircularProgressIndicator()
-            : Text(ref.read(authProvider).isLoggedIn ? "Logout" : "Login"));
+            : Text(ref.read(authProvider).isLoggedIn
+                ? "Déconnexion"
+                : "Se Connecter"));
   }
 }

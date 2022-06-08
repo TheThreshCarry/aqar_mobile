@@ -3,6 +3,7 @@
 import 'package:aqar_mobile/Controllers/AuthController.dart';
 import 'package:aqar_mobile/Controllers/ThemeController.dart';
 import 'package:aqar_mobile/Pages/NeedToSignUp.dart';
+import 'package:aqar_mobile/Pages/UpdateName.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -67,9 +68,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     height: 50,
                     width: 300,
                     child: TextButton(
-                      child: Text("Change Theme"),
+                      child: Text("Changez De Nom"),
                       onPressed: () {
-                        ref.read(themeProvider.notifier).switchTheme();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => UpdateName()));
                       },
                     )),
                 Container(
@@ -77,10 +81,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     height: 50,
                     width: 300,
                     child: TextButton(
-                      child: Text("Reload First Screen"),
+                      child: Text("Changez De Theme"),
                       onPressed: () async {
-                        await ref.read(authProvider).prefs?.remove("firstTime");
-                        Navigator.popAndPushNamed(context, "/");
+                        ref.read(themeProvider.notifier).switchTheme();
                       },
                     )),
                 Container(
@@ -90,7 +93,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     child: TextButton(
                       child: ref.read(authProvider).isLoading
                           ? CircularProgressIndicator()
-                          : Text("Logout"),
+                          : Text("Déconnexion"),
                       onPressed: () async {
                         setState(() {
                           ref.read(authProvider).isLoading = true;

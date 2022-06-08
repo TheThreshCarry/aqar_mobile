@@ -134,7 +134,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage>
                                       return;
                                     } else {
                                       Navigator.popAndPushNamed(
-                                          context, "/test");
+                                          context, "/CheckFirstTime");
                                       return;
                                     }
                                   });

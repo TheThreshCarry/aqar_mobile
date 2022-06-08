@@ -296,14 +296,17 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                         if (result.runtimeType == DioError) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Error on Login")));
+                          setState(() {
+                            loadingEmailLogin = false;
+                          });
                           return;
                         } else {
-                          Navigator.popAndPushNamed(context, "/home");
+                          Navigator.popAndPushNamed(context, "/");
+                          setState(() {
+                            loadingEmailLogin = false;
+                          });
                           return;
                         }
-                        setState(() {
-                          loadingEmailLogin = false;
-                        });
                       }
                     },
                     child: loadingEmailLogin

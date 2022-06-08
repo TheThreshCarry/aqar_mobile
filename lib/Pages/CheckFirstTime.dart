@@ -40,7 +40,12 @@ class _CheckFirstTimeState extends ConsumerState<CheckFirstTime> {
 
         if (loggedIn) {
           await ref.read(authProvider).getUserData();
-          routeName = "/home";
+          print(ref.read(authProvider).userData["user_type"]);
+          if (ref.read(authProvider).userData["user_type"] == 'c') {
+            routeName = "/home";
+          } else {
+            routeName = "/agency/home";
+          }
         } else {
           routeName = "/home";
         }

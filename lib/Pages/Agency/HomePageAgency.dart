@@ -2,20 +2,21 @@
 
 import 'package:aqar_mobile/Controllers/AuthController.dart';
 import 'package:aqar_mobile/Controllers/FilerProvider.dart';
+import 'package:aqar_mobile/Controllers/MiscController.dart';
 import 'package:aqar_mobile/Controllers/PropertiesController.dart';
 import 'package:aqar_mobile/Widgets/CategorySelecter.dart';
 import 'package:aqar_mobile/Widgets/PropertyCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends ConsumerStatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+class HomePageAgency extends ConsumerStatefulWidget {
+  HomePageAgency({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageAgencyState createState() => _HomePageAgencyState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageAgencyState extends ConsumerState<HomePageAgency> {
   @override
   void initState() {
     // TODO: implement initState
@@ -45,7 +46,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Bonjour,",
+                                  "Welcome Back,",
                                   style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w400),
@@ -67,7 +68,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       icon: Icon(Icons.notifications_none_rounded),
                       iconSize: 32,
                       onPressed: () {
-                        Navigator.pushNamed(context, "/test");
+                        // Navigator.pushNamed(context, "/test");
                       },
                     )),
                   )
@@ -76,69 +77,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               SizedBox(
                 height: 20,
               ),
-              Text(
-                "Find Your Home !",
-                style: TextStyle(fontSize: 20),
-              ),
-              Container(
-                height: 50,
-                margin: EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Color(0xFFABABAB), width: 1)),
-                child: Row(
-                  children: [
-                    Container(
-                        margin: EdgeInsets.only(left: 10),
-                        child: Center(
-                            child: Icon(
-                          Icons.search,
-                          size: 30,
-                        ))),
-                    Expanded(
-                        flex: 5,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: TextField(
-                            decoration: InputDecoration(
-                                hintText: "Constantine, Algeria",
-                                border: InputBorder.none),
-                          ),
-                        )),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondary,
-                            borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(10),
-                                bottomRight: Radius.circular(10))),
-                        child: Center(
-                          child: IconButton(
-                            icon: Icon(Icons.filter_list_rounded),
-                            iconSize: 36,
-                            onPressed: () {
-                              ref
-                                  .watch(filterProvider.notifier)
-                                  .switchFilterOn();
-                            },
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Categories",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-              ),
-              CategorySelector(),
               SizedBox(
                 height: 10,
               ),
@@ -146,7 +84,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // ignore: prefer_const_literals_to_create_immutables
                 children: [
-                  Text("Best For You",
+                  Text("All Your Offers",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   Container(
@@ -161,7 +99,10 @@ class _HomePageState extends ConsumerState<HomePage> {
               Container(
                 height: 330,
                 child: FutureBuilder(
-                  future: ref.read(propertiesController).loadAllProperties(),
+                  future: ref
+                      .read(propertiesController)
+                      .loadAllPropertiesAgency(
+                          ref.read(authProvider).userData["id"]),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ShaderMask(
@@ -186,18 +127,47 @@ class _HomePageState extends ConsumerState<HomePage> {
                         blendMode: BlendMode.dstOut,
                         child: Container(
                           height: 330,
-                          child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: ref
+                          child: ref
                                   .read(propertiesController)
                                   .allProperties
-                                  .length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return PropertyCard(
-                                    property: ref
-                                        .read(propertiesController)
-                                        .allProperties[index]);
-                              }),
+                                  .isNotEmpty
+                              ? ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: ref
+                                      .read(propertiesController)
+                                      .allProperties
+                                      .length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return PropertyCard(
+                                        property: ref
+                                            .read(propertiesController)
+                                            .allProperties[index]);
+                                  })
+                              : Center(
+                                  child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Pas D'Offres"),
+                                    Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        height: 50,
+                                        width: 150,
+                                        child: TextButton(
+                                          child: Text(
+                                            "Ajoutez Offre",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          onPressed: () async {
+                                            ref
+                                                .read(generalProvider)
+                                                .homePageController
+                                                ?.animateTo(2);
+                                          },
+                                        )),
+                                  ],
+                                )),
                         ),
                       );
                     } else {
@@ -215,7 +185,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // ignore: prefer_const_literals_to_create_immutables
                 children: [
-                  Text("A La Une",
+                  Text("Most Viewed",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   Container(
@@ -230,7 +200,10 @@ class _HomePageState extends ConsumerState<HomePage> {
               Container(
                 height: 300,
                 child: FutureBuilder(
-                  future: ref.read(propertiesController).loadViewedProperties(),
+                  future: ref
+                      .read(propertiesController)
+                      .loadViewedPropertiesAgency(
+                          ref.read(authProvider).userData["id"]),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ShaderMask(
@@ -253,19 +226,47 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ).createShader(rect);
                         },
                         blendMode: BlendMode.dstOut,
-                        child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.all(8),
-                            itemCount: ref
+                        child: ref
                                 .read(propertiesController)
                                 .mostViewedProperties
-                                .length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return PropertyCard(
-                                  property: ref
-                                      .read(propertiesController)
-                                      .mostViewedProperties[index]);
-                            }),
+                                .isNotEmpty
+                            ? ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.all(8),
+                                itemCount: ref
+                                    .read(propertiesController)
+                                    .mostViewedProperties
+                                    .length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return PropertyCard(
+                                      property: ref
+                                          .read(propertiesController)
+                                          .mostViewedProperties[index]);
+                                })
+                            : Center(
+                                child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Pas D'Offres"),
+                                  Container(
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      height: 50,
+                                      width: 150,
+                                      child: TextButton(
+                                        child: Text(
+                                          "Ajoutez Offre",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        onPressed: () async {
+                                          ref
+                                              .read(generalProvider)
+                                              .homePageController
+                                              ?.animateTo(2);
+                                        },
+                                      )),
+                                ],
+                              )),
                       );
                     } else {
                       return Center(
@@ -282,7 +283,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // ignore: prefer_const_literals_to_create_immutables
                 children: [
-                  Text("Nouveautés",
+                  Text("Most Favorites",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   Container(
@@ -297,7 +298,10 @@ class _HomePageState extends ConsumerState<HomePage> {
               Container(
                 height: 330,
                 child: FutureBuilder(
-                  future: ref.read(propertiesController).loadRecentProperties(),
+                  future: ref
+                      .read(propertiesController)
+                      .loadFavoritedPropertiesAgency(
+                          ref.read(authProvider).userData["id"]),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ShaderMask(
@@ -322,18 +326,47 @@ class _HomePageState extends ConsumerState<HomePage> {
                         blendMode: BlendMode.dstOut,
                         child: Container(
                           height: 330,
-                          child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: ref
+                          child: ref
                                   .read(propertiesController)
                                   .recentProperties
-                                  .length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return PropertyCard(
-                                    property: ref
-                                        .read(propertiesController)
-                                        .recentProperties[index]);
-                              }),
+                                  .isNotEmpty
+                              ? ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: ref
+                                      .read(propertiesController)
+                                      .recentProperties
+                                      .length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return PropertyCard(
+                                        property: ref
+                                            .read(propertiesController)
+                                            .recentProperties[index]);
+                                  })
+                              : Center(
+                                  child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Pas D'Offres"),
+                                    Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        height: 50,
+                                        width: 150,
+                                        child: TextButton(
+                                          child: Text(
+                                            "Ajoutez Offre",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          onPressed: () async {
+                                            ref
+                                                .read(generalProvider)
+                                                .homePageController
+                                                ?.animateTo(2);
+                                          },
+                                        )),
+                                  ],
+                                )),
                         ),
                       );
                     } else {

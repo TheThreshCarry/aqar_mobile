@@ -7,7 +7,9 @@ import 'package:aqar_mobile/Controllers/AuthController.dart';
 import 'package:aqar_mobile/Controllers/MiscController.dart';
 import 'package:aqar_mobile/Controllers/PropertiesController.dart';
 import 'package:aqar_mobile/Controllers/ThemeController.dart';
+import 'package:aqar_mobile/Pages/ConversationPage.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -208,15 +210,20 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                             ref
                                                         .read(propertiesController)
                                                         .selectedProperty?[
-                                                    "line_one"] +
-                                                ", " +
-                                                ref
-                                                    .read(propertiesController)
-                                                    .selectedProperty?["city"] +
-                                                ", " +
-                                                ref
-                                                    .read(propertiesController)
-                                                    .selectedProperty?["country"],
+                                                    "line_one"] ??
+                                                "" +
+                                                    ", " +
+                                                    ref
+                                                            .read(
+                                                                propertiesController)
+                                                            .selectedProperty?[
+                                                        "city"] +
+                                                    ", " +
+                                                    ref
+                                                            .read(
+                                                                propertiesController)
+                                                            .selectedProperty?[
+                                                        "country"],
                                             style:
                                                 const TextStyle(fontSize: 13),
                                           )
@@ -377,9 +384,15 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                           ? " Pas de Prix Mentioné"
                                           : ref
                                                   .read(propertiesController)
-                                                  .selectedProperty!["price"]
-                                                  .toString() +
-                                              " dz/Mois",
+                                                  .selectedProperty?["price"] +
+                                              (ref
+                                                              .read(
+                                                                  propertiesController)
+                                                              .selectedProperty![
+                                                          "offer_type"] ==
+                                                      "r"
+                                                  ? " DZ/Mois"
+                                                  : " DZ"),
                                       style: const TextStyle(fontSize: 20),
                                     )
                                   ],
@@ -387,6 +400,46 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                 SizedBox(
                                   height: 20,
                                 ),
+                                ref
+                                            .read(propertiesController)
+                                            .selectedProperty?["bedrooms"] !=
+                                        null
+                                    ? Container(
+                                        margin: EdgeInsets.only(bottom: 20),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.bed),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(ref
+                                                .read(propertiesController)
+                                                .selectedProperty!["bedrooms"]
+                                                .toString())
+                                          ],
+                                        ),
+                                      )
+                                    : SizedBox(),
+                                ref
+                                            .read(propertiesController)
+                                            .selectedProperty?["bathrooms"] !=
+                                        null
+                                    ? Container(
+                                        margin: EdgeInsets.only(bottom: 20),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.bathroom),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(ref
+                                                .read(propertiesController)
+                                                .selectedProperty!["bathrooms"]
+                                                .toString())
+                                          ],
+                                        ),
+                                      )
+                                    : SizedBox(),
                                 Text(
                                   "Description",
                                   style: const TextStyle(
@@ -422,6 +475,9 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                           onTap: (pos) {},
                                         ))
                                     : SizedBox(),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Container(
                                   height: 100,
                                   width: size.width * 0.8,
@@ -429,56 +485,181 @@ class _PropertyPageState extends ConsumerState<PropertyPage> {
                                       horizontal: size.width * 0.1),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey),
-                                  child: FutureBuilder(
-                                    future: ref
-                                        .read(propertiesController)
-                                        .getOwnerData(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        return Container(
-                                          padding: EdgeInsets.all(10),
-                                          child: Row(
-                                            children: [
-                                              CircleAvatar(
-                                                  radius: 20,
-                                                  backgroundColor:
-                                                      Color.fromRGBO(
-                                                          Random().nextInt(254),
-                                                          Random().nextInt(254),
-                                                          Random().nextInt(254),
-                                                          1),
-                                                  backgroundImage: NetworkImage(ref
-                                                              .read(
-                                                                  propertiesController)
-                                                              .selectedPropertyOwner?[
-                                                          "imageurl"] ??
-                                                      "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png")),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text(
-                                                ref
-                                                            .read(
-                                                                propertiesController)
-                                                            .selectedPropertyOwner?[
-                                                        "name"] ??
-                                                    "",
-                                                style: TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight:
-                                                        FontWeight.w900),
-                                              )
-                                            ],
+                                      color: Color(0xFF282828)),
+                                  child: ref
+                                              .read(propertiesController)
+                                              .selectedProperty?["owner"] !=
+                                          ref.read(authProvider).userData["id"]
+                                      ? FutureBuilder(
+                                          future: ref
+                                              .read(propertiesController)
+                                              .getOwnerData(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              return Container(
+                                                padding: EdgeInsets.all(10),
+                                                child: Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                        radius: 20,
+                                                        backgroundColor:
+                                                            Color.fromRGBO(
+                                                                Random()
+                                                                    .nextInt(
+                                                                        254),
+                                                                Random()
+                                                                    .nextInt(
+                                                                        254),
+                                                                Random()
+                                                                    .nextInt(
+                                                                        254),
+                                                                1),
+                                                        backgroundImage: NetworkImage(ref
+                                                                    .read(
+                                                                        propertiesController)
+                                                                    .selectedPropertyOwner?[
+                                                                "imageurl"] ??
+                                                            "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png")),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        ref
+                                                                    .read(
+                                                                        propertiesController)
+                                                                    .selectedPropertyOwner?[
+                                                                "name"] ??
+                                                            "",
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            fontSize: 24,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w900),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 20,
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () async {
+                                                        var exists = await Dio().get(
+                                                            "https://aqar-server.herokuapp.com/messages/conversation",
+                                                            queryParameters: {
+                                                              "idOne": ref
+                                                                      .read(
+                                                                          propertiesController)
+                                                                      .selectedPropertyOwner?["id"] ??
+                                                                  "",
+                                                              "idTwo": ref
+                                                                  .read(
+                                                                      authProvider)
+                                                                  .userData["id"]
+                                                            });
+
+                                                        if (exists.data[
+                                                                "rowCount"] ==
+                                                            0) {
+                                                          print(
+                                                              "there is no conversation");
+                                                          var create =
+                                                              await Dio().post(
+                                                                  "https://aqar-server.herokuapp.com/messages/conversation",
+                                                                  data: {
+                                                                "userOne": ref
+                                                                        .read(
+                                                                            propertiesController)
+                                                                        .selectedPropertyOwner?["id"] ??
+                                                                    "",
+                                                                "userTwo": ref
+                                                                    .read(
+                                                                        authProvider)
+                                                                    .userData["id"]
+                                                              });
+                                                          print(create.data);
+                                                        } else {
+                                                          print(exists
+                                                              .data["rows"][0]);
+                                                          List<dynamic>
+                                                              allConversations =
+                                                              await ref
+                                                                  .read(
+                                                                      authProvider)
+                                                                  .getConversations();
+                                                          allConversations
+                                                              .forEach(
+                                                                  (element) {
+                                                            if (element["friend"]
+                                                                    ["id"] ==
+                                                                ref
+                                                                    .read(
+                                                                        propertiesController)
+                                                                    .selectedPropertyOwner?["id"]) {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .push(MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) {
+                                                                return ConversationPage(
+                                                                    conversation:
+                                                                        element);
+                                                              }));
+                                                              return;
+                                                            }
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          height: 50,
+                                                          width: 50,
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          999),
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .secondary),
+                                                          child: Center(
+                                                              child: Icon(
+                                                                  Icons.send))),
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            } else {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            }
+                                          },
+                                        )
+                                      : Center(
+                                          child: SizedBox(
+                                            width: size.width * 0.4,
+                                            child: IconButton(
+                                                onPressed: () async {
+                                                  await Dio().delete(
+                                                      "https://aqar-server.herokuapp.com/properties/deleteProperty/${ref.read(propertiesController).selectedProperty?["id"]}");
+                                                },
+                                                icon: Row(
+                                                  children: const [
+                                                    Text("Supprimez L'Offre"),
+                                                    Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ],
+                                                )),
                                           ),
-                                        );
-                                      } else {
-                                        return Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      }
-                                    },
-                                  ),
+                                        ),
                                 ),
                                 SizedBox(
                                   height: 100,

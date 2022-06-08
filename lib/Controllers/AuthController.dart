@@ -35,6 +35,7 @@ class AuthController {
     userData["phone"] = data["phone"] ?? "";
     userData["email"] = data["email"] ?? "";
     userData["id"] = data["id"] ?? "";
+    userData["user_type"] = data["user_type"] ?? "";
   }
 
   Future<SharedPreferences?> setupPrefs() async {
@@ -98,7 +99,6 @@ class AuthController {
         Map<String, dynamic> jsonMap = json.decode(userDataResponse.toString());
         setUserData(jsonMap);
         isLoggedIn = true;
-        print(jsonMap);
         return true;
   }
   String getToken(){

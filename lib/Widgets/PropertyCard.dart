@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:math';
 
 import 'package:aqar_mobile/Pages/PropertyPage.dart';
@@ -46,16 +48,44 @@ class PropertyCard extends ConsumerWidget {
                   margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
                   height: 144,
                   width: 180,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      (property["images"] != null)
-                          ? property["images"][0]
-                          : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Grey_Square.svg/800px-Grey_Square.svg.png",
-                      height: 144,
-                      width: 180,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          (property["images"] != null)
+                              ? (property["images"] as List<dynamic>).isNotEmpty
+                                  ? property["images"][0]
+                                  : "https://www.iconsdb.com/icons/preview/dark-gray/square-xxl.png"
+                              : "https://www.iconsdb.com/icons/preview/dark-gray/square-xxl.png",
+                          height: 144,
+                          width: 180,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      property["offer_type"] != null
+                          ? Positioned(
+                              top: 10,
+                              left: 10,
+                              child: Container(
+                                height: 20,
+                                width: 70,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                child: Center(
+                                    child: Text(
+                                  property["offer_type"] == 'r'
+                                      ? "Location"
+                                      : "Vente",
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.white),
+                                )),
+                              ))
+                          : SizedBox(),
+                    ],
                   ),
                 ),
                 const SizedBox(
@@ -70,7 +100,58 @@ class PropertyCard extends ConsumerWidget {
                     style: const TextStyle(
                         fontWeight: FontWeight.w900, fontSize: 24),
                   ),
-                )
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  property["price"] != null
+                      ? (property["price"] + " DZ/month")
+                      : "",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Colors.grey[200]),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      Icon(Icons.remove_red_eye),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        property["views"] != null
+                            ? (property["views"].toString())
+                            : "",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Colors.grey[200]),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        property["favorites"] != null
+                            ? (property["favorites"].toString())
+                            : "",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Colors.grey[200]),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             )),
       ),

@@ -13,6 +13,7 @@ class PropertiesController {
   List<Map<String, dynamic>> allProperties = [];
   List<Map<String, dynamic>> recentProperties = [];
   List<Map<String, dynamic>> mostViewedProperties = [];
+  List<Map<String, dynamic>> mostFavoritedProperties = [];
   List<Map<String, dynamic>> filteredProperties = [];
   List<Map<String, dynamic>> favoriteProperties = [];
   List<Map<String, dynamic>> surroundingProperties = [];
@@ -25,6 +26,21 @@ class PropertiesController {
 
     var results = await Dio()
         .get('https://aqar-server.herokuapp.com/properties/getThumbnails');
+    List<dynamic> data = results.data;
+
+    for (var element in data) {
+      if (checkForDuplicate(element, allProperties)) break;
+      allProperties.add(element);
+      // Map<String, dynamic> jsonMap = json.decode(userDataResponse.toString());
+    }
+    return true;
+  }
+
+  Future<bool> loadAllPropertiesAgency(String id) async {
+    allProperties.clear();
+
+    var results = await Dio()
+        .get('https://aqar-server.herokuapp.com/properties/agency/$id');
     List<dynamic> data = results.data;
 
     for (var element in data) {
@@ -65,6 +81,36 @@ class PropertiesController {
     return true;
   }
 
+  Future<bool> loadViewedPropertiesAgency(String id) async {
+    mostViewedProperties.clear();
+
+    var results = await Dio().get(
+        'https://aqar-server.herokuapp.com/properties/agency/mostViewed/$id');
+    List<dynamic> data = results.data;
+
+    for (var element in data) {
+      if (checkForDuplicate(element, mostViewedProperties)) break;
+      mostViewedProperties.add(element);
+      // Map<String, dynamic> jsonMap = json.decode(userDataResponse.toString());
+    }
+    return true;
+  }
+
+  Future<bool> loadFavoritedPropertiesAgency(String id) async {
+    mostFavoritedProperties.clear();
+
+    var results = await Dio().get(
+        'https://aqar-server.herokuapp.com/properties/agency/mostFavorited/$id');
+    List<dynamic> data = results.data;
+
+    for (var element in data) {
+      if (checkForDuplicate(element, mostFavoritedProperties)) break;
+      mostFavoritedProperties.add(element);
+      // Map<String, dynamic> jsonMap = json.decode(userDataResponse.toString());
+    }
+    return true;
+  }
+
   Future<bool> loadSurroundingProperties(Position userPos) async {
     surroundingProperties.clear();
 
@@ -92,10 +138,9 @@ class PropertiesController {
       isFavorited = isFavoritedRequest.data;
     }
     dynamic data = results.data;
-    print("results $results");
-    if (data["images"] == null) {
+    if (data["images"] == null || (data["images"] as List<dynamic>).isEmpty) {
       data["images"] = [
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Grey_Square.svg/800px-Grey_Square.svg.png"
+        "https://www.iconsdb.com/icons/preview/dark-gray/square-xxl.png"
       ];
     }
     if (data != null) {
@@ -173,6 +218,7 @@ class PropertiesController {
   int bathRoomsSelected = -1;
   int areaSelected = -1;
   bool allCategoriesToggled = false;
+  double distanceSelected = 0;
   List<double> priceRange = [1000, 1500];
 
   void toggleCategory(int index) {
@@ -198,13 +244,42 @@ class PropertiesController {
     }
   }
 
-  Map<String, dynamic> getFilters() {
+  Map<String, dynamic> newOffer = {};
+  Future<bool> postOffer(Map<String, dynamic> offer) async {
+    filteredProperties.clear();
+    var results = await Dio().post(
+        "https://aqar-server.herokuapp.com/properties/listProperty",
+        data: offer);
+    dynamic data = results.data;
+    print(data);
+    return true;
+  }
+
+  Future<bool> loadFilteredProperties(double? lat, double? long) async {
+    filteredProperties.clear();
+    var results = await Dio().post(
+        "https://aqar-server.herokuapp.com/properties/filter",
+        data: getFilters(lat, long));
+    List<dynamic> data = results.data;
+    for (var element in data) {
+      if (checkForDuplicate(element, filteredProperties)) break;
+      filteredProperties.add(element);
+      // Map<String, dynamic> jsonMap = json.decode(userDataResponse.toString());
+    }
+    return true;
+  }
+
+  Map<String, dynamic> getFilters(double? lat, double? long) {
     return {
       "price_greater_than": priceRange[0],
       "price_lower_than": priceRange[1],
       "rooms": roomsSelected == -1 ? null : roomsSelected,
       "bathRooms": bathRoomsSelected == -1 ? null : bathRoomsSelected,
       "area": areaSelected == -1 ? null : areaSelected,
+      "distance_lower_than": distanceSelected == 0 ? null : distanceSelected,
+      "lat": distanceSelected == 0 ? null : lat,
+      "long": distanceSelected == 0 ? null : long,
+      "offerType": selectedType
     };
   }
 }
